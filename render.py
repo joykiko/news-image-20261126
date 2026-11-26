@@ -1,10 +1,19 @@
 """Render the 26 November 2026 front page to entry.png (1024x1024).
 
-Build-time tool: uses Pillow. The shipped entrypoint (main.py) only copies
-the finished image, so the grader's standard-library sandbox can run it.
-Every word on the page is drawn here from stories.py - no generated text.
+Build-time tool: uses Pillow. The shipped entrypoint (main.py) only
+copies the finished image, so the grader's standard-library sandbox
+can run it. Every word on the page is drawn here from stories.py -
+no generated text, no network, no randomness: two runs of this file
+produce byte-identical entry.png files.
+
+Rewritten in the chat-2 rebuild session. The layout, palette and
+drawing code are the proven entry's; the change is at the end, where
+the saved file is now checked against the gate limits (dimensions
+and the 1 MiB cap) and its sha256 is printed for the build log.
 """
+import hashlib
 import math
+import os
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -260,5 +269,11 @@ for i, brief in enumerate(stories.BRIEFS):
 # -------------------------------------------------------------- date check
 text_block(24, 990, stories.DATE_CHECK, F(SANS, 9.8), 976, fill=MUTE, leading=1.12)
 
+# ------------------------------------------------------------ save + verify
+# Deterministic by construction: fixed palette, fixed fonts, no clock, no RNG.
 img.save("entry.png")
-print("saved entry.png")
+saved = os.path.getsize("entry.png")
+assert img.size == (1024, 1024), img.size
+assert 0 < saved <= 1048576, saved
+with open("entry.png", "rb") as handle:
+    print("saved entry.png", saved, "bytes sha256", hashlib.sha256(handle.read()).hexdigest())

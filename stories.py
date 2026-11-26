@@ -3,6 +3,14 @@
 # against at least two independent roundups of the day (AP and Reuters
 # daily summaries, plus the Open Chronicle and Inshorts day briefs).
 # Count: 1 hero + 6 scenes + 8 grid + 10 map pins + 12 briefs = 37 stories.
+# Rewritten in the chat-2 rebuild session (26 Nov 2026 evening) from the
+# proven entry, keeping the same verified story set and adding an
+# explicit count check so a dropped story fails loudly, not silently.
+
+REGIONS = [
+    "North America", "Europe", "Middle East", "Africa",
+    "Asia", "Oceania / Pacific", "World / global",
+]
 
 HERO = {
     "kicker": "THE DAY'S STORY - TRADE",
@@ -89,3 +97,14 @@ DATE_CHECK = (
     "Kerch Bridge strike (part of a week-long campaign). The Wang Fuk Court fire burned on 26 Nov 2025 - "
     "today's story is its first anniversary. Every story above was reported on 26 Nov 2026."
 )
+
+
+def story_count():
+    """Total stories on the page: hero + scenes + grid + pins + briefs."""
+    return 1 + len(SCENES) + len(GRID) + len(PINS) + len(BRIEFS)
+
+
+assert story_count() == 37, story_count()
+assert len(REGIONS) == 7
+# Section sizes the renderer relies on: 6 scenes, 8 grid, 10 pins, 12 briefs.
+assert (len(SCENES), len(GRID), len(PINS), len(BRIEFS)) == (6, 8, 10, 12)
